@@ -132,16 +132,13 @@ int headerSize=10;
 int i = 0;
 
 	while(i < headerSize) {
-		buf[i] = fgetc(fp);
-		if( feof(fp) ) { 
-		break ;
+	buf[i] = fgetc(fp);
+		if(feof(fp) ) { 
+			return ID3V2_STATUS_READ_HEADER_FAILED;
 		}
-		//printf("%c", c);
-		i++;
+	printf(" %d : %c\n", i,buf[i]);
+	i++;
 	}
-      
-        if ( i < 9 )
-	   return ID3V2_STATUS_READ_HEADER_FAILED;
 
 return ID3V2_STATUS_SUCCESS;
 
