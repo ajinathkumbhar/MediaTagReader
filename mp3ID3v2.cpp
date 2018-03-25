@@ -14,7 +14,7 @@ int main () {
    i=1;
    byteCount=3;
   
-   fp = fopen("02.mp3","r");
+   fp = fopen("testContent/testsample.mp3","r");
    while(i <= byteCount) {
       c = fgetc(fp);
       if( feof(fp) ) { 
