@@ -14,6 +14,8 @@ int isID3V2Tag(FILE *IDfp);
 int readID3V2TagHeader(FILE*, char*);
 char * readTag(FILE *fp);
 
+
+
 // Error Code
 enum id3v2_error_code {
 ID3V2_STATUS_FAIL=-1,
@@ -34,17 +36,25 @@ char flag;
 int size;
 };
 
-
-
-int main () {
+/********************************
+* func : int main(int argc,char* argv[])
+*
+*********************************/
+int main(int argc,char* argv[])
+{
    FILE *fp;
    int c,i,byteCount;
    i=1;
    byteCount=3;
    int status = ID3V2_STATUS_UNKNOWN;
   
-   fp = fopen("testContent/testsample.mp3","r");
-    
+   if(argc !=2 ) {
+	printf("Usage:\n");
+	printf("\t%s file.mp3\n",argv[0]);
+	return ID3V2_STATUS_FAIL;
+   }
+      
+   fp = fopen(argv[1],"r");
    if ( fp == NULL ) {
         status = ID3V2_STATUS_FILE_NOT_FOUND;
    }
@@ -91,7 +101,6 @@ int main () {
    return(0);
 }
 
-
 /********************************
 * func : isID3V2Tag(FILE *IDfp)
 * param: IDfp - file pointer
@@ -136,7 +145,7 @@ int i = 0;
 		if(feof(fp) ) { 
 			return ID3V2_STATUS_READ_HEADER_FAILED;
 		}
-	printf(" %d : %c\n", i,buf[i]);
+	//printf(" %d : %c\n", i,buf[i]);
 	i++;
 	}
 
