@@ -10,8 +10,16 @@ ID3v2 size              4 * %0xxxxxxx
 #include <stdlib.h>
 #include <string.h>
 
+struct id3v2header {
+char id[3];
+char version[2];
+char flag;
+int size;
+};
+
+
 int isID3V2Tag(FILE *IDfp);
-int readID3V2TagHeader(FILE*, char*);
+int readID3V2TagHeader(FILE*, id3v2header*);
 char * readTag(FILE *fp);
 
 
@@ -29,12 +37,6 @@ ID3V2_STATUS_EOF_ERROR,
 ID3V2_STATUS_UNKNOWN,
 };
 
-struct id3v2header {
-char id[3];
-char version[2];
-char flag;
-int size;
-};
 
 /********************************
 * func : int main(int argc,char* argv[])
@@ -43,9 +45,6 @@ int size;
 int main(int argc,char* argv[])
 {
    FILE *fp;
-   int c,i,byteCount;
-   i=1;
-   byteCount=3;
    int status = ID3V2_STATUS_UNKNOWN;
   
    if(argc !=2 ) {
@@ -107,10 +106,14 @@ int main(int argc,char* argv[])
 * return: 0 if not id3v2 else return 1 for ID3v2
 *********************************/
 int isID3V2Tag(FILE *IDfp) {
-	int headerSize=0;
-	char * ptrId3v2Header = NULL;
-	ptrId3v2Header = (char *)malloc(0);
 	int ret;
+	char id[3];
+	char version[2];
+	char flag;
+	int size;
+
+	id3v2header * ptrId3v2Header = NULL;
+	ptrId3v2Header = (id3v2header *)malloc(sizeof(id3v2header));
 	if ( ptrId3v2Header == NULL )
 		return ID3V2_STATUS_MALLOC_ERROR;
 
@@ -119,9 +122,15 @@ int isID3V2Tag(FILE *IDfp) {
 		return ID3V2_STATUS_READ_HEADER_FAILED;	
 	}
 	
- 	if (strncmp(ptrId3v2Header,"ID3",3) == 0) {
-		printf("content of ptrId3v2Header : \n");
-		printf("%s\n",ptrId3v2Header); 
+ 	if (strncmp(ptrId3v2Header->id,"ID3",3) == 0) {
+		snprintf (id, 4, "%s", ptrId3v2Header->id );
+		printf("\n----------------------------\n");
+		printf("id      : %s\n",id);
+		printf("version : %02x %02x\n",ptrId3v2Header->version[0], ptrId3v2Header->version[1]);
+		printf("flag    : %c\n",ptrId3v2Header->flag);
+		printf("size    : %d\n",ptrId3v2Header->size);
+		printf("----------------------------\n\n");
+
 		ret = ID3V2_STATUS_ID3_TAG_FOUND;
         } else 
 		ret = ID3V2_STATUS_INVALID_TAG;
@@ -131,25 +140,15 @@ return ret;
 
 
 /********************************
-* func : readID3V2TagHeader(FILE *IDfp)
+* func : readID3V2TagHeader(FILE *fp,id3v2header * buf)
 * param: IDfp - file pointer
 * return: char * - pointer to Header
 *********************************/
-int readID3V2TagHeader(FILE *fp,char * buf) {
+int readID3V2TagHeader(FILE *fp,id3v2header * buf) {
 
-int headerSize=10;
-int i = 0;
-
-	while(i < headerSize) {
-	buf[i] = fgetc(fp);
-		if(feof(fp) ) { 
-			return ID3V2_STATUS_READ_HEADER_FAILED;
-		}
-	//printf(" %d : %c\n", i,buf[i]);
-	i++;
-	}
-
-return ID3V2_STATUS_SUCCESS;
+	int readBytes=0;
+	readBytes = fread(buf, sizeof(id3v2header), 1, fp);
+	return readBytes ? ID3V2_STATUS_SUCCESS : ID3V2_STATUS_READ_HEADER_FAILED; 
 
 }
 
