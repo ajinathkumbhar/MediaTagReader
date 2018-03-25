@@ -1,10 +1,4 @@
-/*
-ID3v2/file identifier   "ID3"
-ID3v2 version           $03 00
-ID3v2 flags             %abc00000
-ID3v2 size              4 * %0xxxxxxx
 
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,9 +102,6 @@ int main(int argc,char* argv[])
 int isID3V2Tag(FILE *IDfp) {
 	int ret;
 	char id[3];
-	char version[2];
-	char flag;
-	int size;
 
 	id3v2header * ptrId3v2Header = NULL;
 	ptrId3v2Header = (id3v2header *)malloc(sizeof(id3v2header));
@@ -143,6 +134,13 @@ return ret;
 * func : readID3V2TagHeader(FILE *fp,id3v2header * buf)
 * param: IDfp - file pointer
 * return: char * - pointer to Header
+
+ID3v2/file identifier   "ID3"
+ID3v2 version           $03 00
+ID3v2 flags             %abc00000
+ID3v2 size              4 * %0xxxxxxx
+
+
 *********************************/
 int readID3V2TagHeader(FILE *fp,id3v2header * buf) {
 
