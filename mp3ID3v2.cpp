@@ -81,7 +81,8 @@ int isID3V2Tag(FILE *IDfp) {
 	if (strncmp(ptrId3v2Header,"ID3",3) == 0) {
 		printf("id3 check done \n");
 		ret = 0;
-        }
+        } else 
+		ret = -1;
 	
 return ret;	
 }
