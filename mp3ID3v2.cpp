@@ -15,6 +15,11 @@ int main () {
    byteCount=3;
   
    fp = fopen("testContent/testsample.mp3","r");
+    
+   if ( fp == NULL ) {
+	printf("File not found or file open error\n");
+        return -1;
+   }
    while(i <= byteCount) {
       c = fgetc(fp);
       if( feof(fp) ) { 
