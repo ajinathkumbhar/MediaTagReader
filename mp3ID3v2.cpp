@@ -14,6 +14,19 @@ int isID3V2Tag(FILE *IDfp);
 int readID3V2TagHeader(FILE*, char*);
 char * readTag(FILE *fp);
 
+// Error Code
+enum id3v2_error_code {
+ID3V2_STATUS_FAIL=-1,
+ID3V2_STATUS_SUCCESS,
+ID3V2_STATUS_FILE_NOT_FOUND,
+ID3V2_STATUS_INVALID_TAG,
+ID3V2_STATUS_ID3_TAG_FOUND,
+ID3V2_STATUS_MALLOC_ERROR,
+ID3V2_STATUS_READ_HEADER_FAILED,
+ID3V2_STATUS_EOF_ERROR,
+ID3V2_STATUS_UNKNOWN,
+};
+
 struct id3v2header {
 char id[3];
 char version[2];
@@ -28,27 +41,52 @@ int main () {
    int c,i,byteCount;
    i=1;
    byteCount=3;
-   int status = -1;
+   int status = ID3V2_STATUS_UNKNOWN;
   
    fp = fopen("testContent/testsample.mp3","r");
     
    if ( fp == NULL ) {
-	printf("File not found or file open error\n");
-        return -1;
+        status = ID3V2_STATUS_FILE_NOT_FOUND;
    }
 
    // check id3v2 compataible
-   status = isID3V2Tag(fp);
-   if (status == -1) {
-	printf("ID3v2 incompataible tag .... try with another mp3 file\n"); 
-	return -1; 
-   } 
+   if (status == ID3V2_STATUS_UNKNOWN) {
+	   status = isID3V2Tag(fp);
+   }
 
-   printf("ID3v2 Tag Found !!! \n");
-	
-   
+   switch(status) {
+	case ID3V2_STATUS_FAIL:
+		printf("Failed to read id3v2 tag\n");
+	     	break;
+	case ID3V2_STATUS_SUCCESS:
+		printf("ID3V2 tag read success\n");
+	     	break;
+	case ID3V2_STATUS_FILE_NOT_FOUND:
+		printf("mp3 file not found\n");
+	     	break;
+	case ID3V2_STATUS_INVALID_TAG:
+		printf("Invalid tag\n");
+	     	break;
+	case ID3V2_STATUS_ID3_TAG_FOUND:
+		printf("ID3V2 tag found\n");
+	     	break;
+	case ID3V2_STATUS_MALLOC_ERROR:
+		printf("Memroy allocation failed\n");
+	     	break;
+	case ID3V2_STATUS_READ_HEADER_FAILED:
+		printf("failed to read ID3v2 header\n");
+	     	break;
+	case ID3V2_STATUS_EOF_ERROR:
+		printf("Failed to read id3v2 tag\n");
+	     	break;
+	default:
+		printf("Unknown error");
+    }
+
    printf("\n");
-   fclose(fp);
+   
+   if (status != ID3V2_STATUS_FILE_NOT_FOUND )
+	   fclose(fp);
    
    return(0);
 }
@@ -60,29 +98,24 @@ int main () {
 * return: 0 if not id3v2 else return 1 for ID3v2
 *********************************/
 int isID3V2Tag(FILE *IDfp) {
-	int headerSize=10;
+	int headerSize=0;
 	char * ptrId3v2Header = NULL;
-	ptrId3v2Header = (char *)malloc(headerSize);
-	int ret = -1;
-	if ( ptrId3v2Header == NULL ) {
-		printf("failed to allocate memory for ptrId3v2Header\n");
-		return ret;
-	}
+	ptrId3v2Header = (char *)malloc(0);
+	int ret;
+	if ( ptrId3v2Header == NULL )
+		return ID3V2_STATUS_MALLOC_ERROR;
 
 	ret = readID3V2TagHeader(IDfp,ptrId3v2Header);
-	if (ret == -1) {
-		printf("readID3V2TagHeader failed\n");
-		return ret;	
+	if (ret != ID3V2_STATUS_SUCCESS) {
+		return ID3V2_STATUS_READ_HEADER_FAILED;	
 	}
 	
-	printf("content of ptrId3v2Header : \n");
-	printf("%s\n",ptrId3v2Header);  
-	
-	if (strncmp(ptrId3v2Header,"ID3",3) == 0) {
-		printf("id3 check done \n");
-		ret = 0;
+ 	if (strncmp(ptrId3v2Header,"ID3",3) == 0) {
+		printf("content of ptrId3v2Header : \n");
+		printf("%s\n",ptrId3v2Header); 
+		ret = ID3V2_STATUS_ID3_TAG_FOUND;
         } else 
-		ret = -1;
+		ret = ID3V2_STATUS_INVALID_TAG;
 	
 return ret;	
 }
@@ -98,12 +131,6 @@ int readID3V2TagHeader(FILE *fp,char * buf) {
 int headerSize=10;
 int i = 0;
 
-	if ( buf == NULL ) {
-		printf("buffer add null\n");
-		return -1;
-	}
-
-
 	while(i < headerSize) {
 		buf[i] = fgetc(fp);
 		if( feof(fp) ) { 
@@ -112,8 +139,11 @@ int i = 0;
 		//printf("%c", c);
 		i++;
 	}
+      
+        if ( i < 9 )
+	   return ID3V2_STATUS_READ_HEADER_FAILED;
 
-return 0;
+return ID3V2_STATUS_SUCCESS;
 
 }
 
