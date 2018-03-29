@@ -9,3 +9,13 @@ git add filename
 git commit -m "Adding test file"
 git push origin master
 ********************/
+#include<stdio.h>
+int main()
+{
+printf("hello");
+printf("ajay\n");
+
+return 0;
+
+}
+
