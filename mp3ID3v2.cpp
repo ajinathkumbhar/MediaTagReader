@@ -1,9 +1,89 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mp3ID3v2.h"
+
+#define ID3V2_HEADER_IN_BYTES 10
+
+/****************
+
+  4.2.1 TIT2 Title/songname/content description
+  4.2.2 TPE1 Lead performer(s)/Soloist(s)
+  4.2.1 TALB Album/Movie/Show title
+  4.2.2 TCOM Composer
+  4.2.3 TCON Content type
+
+
+
+
+Frame ID       $xx xx xx xx (four characters)
+Size           $xx xx xx xx
+Flags          $xx xx
+endchar   null + size
+
+
+" --------------- size -------------"
+*/
+
+
+
+
+
+
+
+/********************************
+* func : int readID3v2Frame(FILE *fp) 
+*
+*********************************/
+int readID3v2Frame(FILE *fp) {
+	int NextFrame = ID3V2_HEADER_IN_BYTES;
+	//int Nextdata;
+	int count=0;
+	char id[4];
+	int readByte;
+	//char d[100];
+	//char e[100];
+	id3v2Frame * frameTitle;
+
+	frameTitle = (id3v2Frame *) malloc(sizeof(id3v2Frame));
+	frameTitle->head = (id3v2Frameheader *)malloc(sizeof(id3v2Frameheader));
+    frameTitle->data = (char *) malloc(sizeof(100));
+
+	//skip 10 byte of mp3ID3v2 tag header
+	fseek(fp, NextFrame, SEEK_SET);
+	readID3v2FrameHeader(fp,frameTitle->head);
+    
+	// print 1st frame header
+    snprintf(id, 5, "%s", frameTitle->head->id);
+	printf("Frame Tag  : %s\n",id);
+	printf("sizeHex    : %02x %02x %02x %02x\n",frameTitle->head->dataSize[0],frameTitle->head->dataSize[1],frameTitle->head->dataSize[2],frameTitle->head->dataSize[3]);
+	printf("sizeInt    : %d\n",frameTitle->head->dataSize[3]);
+	printf("flag       : %02x %02x \n",frameTitle->head->flag[0],frameTitle->head->flag[1]);
+	
+	fseek(fp,20, SEEK_SET);
+	readByte = fread(frameTitle->data, sizeof(char),frameTitle->head->dataSize[3], fp);
+    
+	printf("data       : ");
+	for(count=0;count <=42 ; count++) 
+		printf("%c",frameTitle->data[count]);
+	printf("\n");
+
+}
+
+/********************************
+* func : int readID3v2FrameHeader(char *fAdd,id3v2Frameheader * frameHead);
+*
+*********************************/
+int readID3v2FrameHeader(FILE *fAdd,id3v2Frameheader * frameHead) {
+ 	int readByte;
+
+	readByte = fread(frameHead, sizeof(frameHead), 1, fAdd);
+return 1;
+}
+
+
+
+
 
 /********************************
 * func : int main(int argc,char* argv[])
@@ -32,7 +112,12 @@ int main(int argc,char* argv[])
 
 	printStatus(status);
 
-   
+	if (status == ID3V2_STATUS_ID3_TAG_FOUND) {
+		readID3v2Frame(fp);
+	
+
+	}
+
 
    printf("\n");
    
