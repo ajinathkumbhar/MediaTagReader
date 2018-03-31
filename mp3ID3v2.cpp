@@ -5,30 +5,31 @@
 #include <string.h>
 
 struct id3v2header {
-char id[3];
-char version[2];
-char flag;
-int size;
+	char id[3];
+	char version[2];
+	char flag;
+	int size;
 };
 
 
 int isID3V2Tag(FILE *IDfp);
 int readID3V2TagHeader(FILE*, id3v2header*);
+void printStatus(int status);
 char * readTag(FILE *fp);
 
 
 
 // Error Code
 enum id3v2_error_code {
-ID3V2_STATUS_FAIL=-1,
-ID3V2_STATUS_SUCCESS,
-ID3V2_STATUS_FILE_NOT_FOUND,
-ID3V2_STATUS_INVALID_TAG,
-ID3V2_STATUS_ID3_TAG_FOUND,
-ID3V2_STATUS_MALLOC_ERROR,
-ID3V2_STATUS_READ_HEADER_FAILED,
-ID3V2_STATUS_EOF_ERROR,
-ID3V2_STATUS_UNKNOWN,
+	ID3V2_STATUS_FAIL=-1,
+	ID3V2_STATUS_SUCCESS,
+	ID3V2_STATUS_FILE_NOT_FOUND,
+	ID3V2_STATUS_INVALID_TAG,
+	ID3V2_STATUS_ID3_TAG_FOUND,
+	ID3V2_STATUS_MALLOC_ERROR,
+	ID3V2_STATUS_READ_HEADER_FAILED,
+	ID3V2_STATUS_EOF_ERROR,
+	ID3V2_STATUS_UNKNOWN,
 };
 
 
@@ -57,34 +58,9 @@ int main(int argc,char* argv[])
 	   status = isID3V2Tag(fp);
    }
 
-   switch(status) {
-	case ID3V2_STATUS_FAIL:
-		printf("Failed to read id3v2 tag\n");
-	     	break;
-	case ID3V2_STATUS_SUCCESS:
-		printf("ID3V2 tag read success\n");
-	     	break;
-	case ID3V2_STATUS_FILE_NOT_FOUND:
-		printf("mp3 file not found\n");
-	     	break;
-	case ID3V2_STATUS_INVALID_TAG:
-		printf("Invalid tag\n");
-	     	break;
-	case ID3V2_STATUS_ID3_TAG_FOUND:
-		printf("ID3V2 tag found\n");
-	     	break;
-	case ID3V2_STATUS_MALLOC_ERROR:
-		printf("Memroy allocation failed\n");
-	     	break;
-	case ID3V2_STATUS_READ_HEADER_FAILED:
-		printf("failed to read ID3v2 header\n");
-	     	break;
-	case ID3V2_STATUS_EOF_ERROR:
-		printf("Failed to read id3v2 tag\n");
-	     	break;
-	default:
-		printf("Unknown error");
-    }
+	printStatus(status);
+
+   
 
    printf("\n");
    
@@ -151,4 +127,41 @@ int readID3V2TagHeader(FILE *fp,id3v2header * buf) {
 }
 
 
+/********************************
+* func : void printStatus(int status);
+* param: status - type enum id3v2_error_code
+* return: void
+*********************************/
+
+void printStatus(int status) {
+	switch(status) {
+		case ID3V2_STATUS_FAIL:
+			printf("Failed to read id3v2 tag\n");
+			 	break;
+		case ID3V2_STATUS_SUCCESS:
+			printf("ID3V2 tag read success\n");
+			 	break;
+		case ID3V2_STATUS_FILE_NOT_FOUND:
+			printf("mp3 file not found\n");
+			 	break;
+		case ID3V2_STATUS_INVALID_TAG:
+			printf("Invalid tag\n");
+			 	break;
+		case ID3V2_STATUS_ID3_TAG_FOUND:
+			printf("ID3V2 tag found\n");
+			 	break;
+		case ID3V2_STATUS_MALLOC_ERROR:
+			printf("Memroy allocation failed\n");
+			 	break;
+		case ID3V2_STATUS_READ_HEADER_FAILED:
+			printf("failed to read ID3v2 header\n");
+			 	break;
+		case ID3V2_STATUS_EOF_ERROR:
+			printf("Failed to read id3v2 tag\n");
+			 	break;
+		default:
+			printf("Unknown error");
+	}
+
+}
 
