@@ -1,8 +1,10 @@
+// 10 byte
+#pragma pack(1)
 struct id3v2header {
 	char id[3];
 	char version[2];
 	char flag;
-	int size;
+        int size;
 };
 
 struct id3v2Frameheader {
