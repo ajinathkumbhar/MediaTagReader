@@ -14,59 +14,46 @@
   4.2.3 TCON Content type
 
 
-
-
 Frame ID       $xx xx xx xx (four characters)
 Size           $xx xx xx xx
 Flags          $xx xx
 endchar   null + size
 
 
-" --------------- size -------------"
-*/
-
-
-
-
-
-
-
-/********************************
+/************************
 * func : int readID3v2Frame(FILE *fp) 
 *
 *********************************/
 int readID3v2Frame(FILE *fp) {
-	int NextFrame = ID3V2_HEADER_IN_BYTES;
-	//int Nextdata;
-	int count=0;
-	char id[4];
-	int readByte;
-	//char d[100];
-	//char e[100];
-	id3v2Frame * frameTitle;
+    int count=0;
+    char id[4];
+    int readByte;
+    id3v2Frame * frame;
+    int size;
+    int count1=1;
 
-	frameTitle = (id3v2Frame *) malloc(sizeof(id3v2Frame));
-	frameTitle->head = (id3v2Frameheader *)malloc(sizeof(id3v2Frameheader));
-    frameTitle->data = (char *) malloc(sizeof(100));
+    frame = (id3v2Frame *) malloc(sizeof(id3v2Frame));
+    frame->head = (id3v2Frameheader *)malloc(sizeof(id3v2Frameheader));
+    frame->data = (char *) malloc(sizeof(100));
 
-	//skip 10 byte of mp3ID3v2 tag header
-	fseek(fp, NextFrame, SEEK_SET);
-	readID3v2FrameHeader(fp,frameTitle->head);
-    
-	// print 1st frame header
-    snprintf(id, 5, "%s", frameTitle->head->id);
-	printf("Frame Tag  : %s\n",id);
-	printf("sizeHex    : %02x %02x %02x %02x\n",frameTitle->head->dataSize[0],frameTitle->head->dataSize[1],frameTitle->head->dataSize[2],frameTitle->head->dataSize[3]);
-	printf("sizeInt    : %d\n",frameTitle->head->dataSize[3]);
-	printf("flag       : %02x %02x \n",frameTitle->head->flag[0],frameTitle->head->flag[1]);
-	
-	fseek(fp,20, SEEK_SET);
-	readByte = fread(frameTitle->data, sizeof(char),frameTitle->head->dataSize[3], fp);
-    
-	printf("data       : ");
-	for(count=0;count <=42 ; count++) 
-		printf("%c",frameTitle->data[count]);
-	printf("\n");
+    while (count1 <= 5) {
+        readID3v2FrameHeader(fp,frame->head);
+        // print 1st frame header
+        snprintf(id, 5, "%s", frame->head->id);
+        printf("Frame Tag  : %s\n",id);
+//        printf("sizeHex    : %02x %02x %02x %02x\n",frame->head->dataSize[0],frame->head->dataSize[1],frame->head->dataSize[2],frame->head->dataSize[3]);
+//        printf("sizeInt    : %d\n",frame->head->dataSize[3]);
+//        printf("flag       : %02x %02x \n",frame->head->flag[0],frame->head->flag[1]);
+        size = (int)frame->head->dataSize[3];
+        readByte = fread(frame->data,1,size,fp);
+
+        printf("data       : ");
+        for(count=0;count < readByte ; count++)
+            printf("%c",frame->data[count]);
+        printf("\n");
+        count1++;
+    }
+
 
 }
 
@@ -75,14 +62,10 @@ int readID3v2Frame(FILE *fp) {
 *
 *********************************/
 int readID3v2FrameHeader(FILE *fAdd,id3v2Frameheader * frameHead) {
- 	int readByte;
-
-	readByte = fread(frameHead, sizeof(frameHead), 1, fAdd);
+    int readByte;
+    readByte = fread(frameHead, sizeof(id3v2Frameheader), 1, fAdd);
 return 1;
 }
-
-
-
 
 
 /********************************
@@ -127,7 +110,9 @@ int main(int argc,char* argv[])
    return(0);
 }
 
-/********************************
+/********************************	//skip 10 byte of mp3ID3v2 tag header
+    fseek(fp, NextFrame, SEEK_SET);
+    readID3v2FrameHeader(fp,frame->head);
 * func : isID3V2Tag(FILE *IDfp)
 * param: IDfp - file pointer
 * return: 0 if not id3v2 else return 1 for ID3v2
@@ -178,6 +163,7 @@ ID3v2 size              4 * %0xxxxxxx
 int readID3V2TagHeader(FILE *fp,id3v2header * buf) {
 
 	int readBytes=0;
+    printf(" ---------------- size of id3v2header %d \n",sizeof(id3v2header));
 	readBytes = fread(buf, sizeof(id3v2header), 1, fp);
 	return readBytes ? ID3V2_STATUS_SUCCESS : ID3V2_STATUS_READ_HEADER_FAILED; 
 
