@@ -40,14 +40,30 @@ int readID3v2Frame(FILE *fp) {
         readID3v2FrameHeader(fp,frame->head);
         // print 1st frame header
         snprintf(id, 5, "%s", frame->head->id);
-        printf("Frame Tag  : %s\n",id);
+ //       printf("Frame Tag  : %s\n",id);
 //        printf("sizeHex    : %02x %02x %02x %02x\n",frame->head->dataSize[0],frame->head->dataSize[1],frame->head->dataSize[2],frame->head->dataSize[3]);
 //        printf("sizeInt    : %d\n",frame->head->dataSize[3]);
 //        printf("flag       : %02x %02x \n",frame->head->flag[0],frame->head->flag[1]);
         size = (int)frame->head->dataSize[3];
         readByte = fread(frame->data,1,size,fp);
 
-        printf("data       : ");
+        if (strncmp(id,"TIT2",4)==0){
+        printf("SONG-TITLE       : ");
+        }
+       else if (strncmp(id,"TPE1",4)==0){
+        printf("SONG-PERFORMER   : ");
+        }
+        else if (strncmp(id,"TALB",4)==0){
+        printf("SONG-MOVIE/ALBUM : ");
+        }
+        else if (strncmp(id,"TCON",4)==0){
+        printf("SONG-CONTENT     : ");
+        }
+        else if (strncmp(id,"TYER",4)==0){
+        printf("SONG-YEAR        : ");
+        }
+        else
+             printf("data        : ");
         for(count=0;count < readByte ; count++)
             printf("%c",frame->data[count]);
         printf("\n");
@@ -163,7 +179,7 @@ ID3v2 size              4 * %0xxxxxxx
 int readID3V2TagHeader(FILE *fp,id3v2header * buf) {
 
 	int readBytes=0;
-    printf(" ---------------- size of id3v2header %d \n",sizeof(id3v2header));
+   //   printf(" ---------------- size of id3v2header %d \n",sizeof(id3v2header));
 	readBytes = fread(buf, sizeof(id3v2header), 1, fp);
 	return readBytes ? ID3V2_STATUS_SUCCESS : ID3V2_STATUS_READ_HEADER_FAILED; 
 
