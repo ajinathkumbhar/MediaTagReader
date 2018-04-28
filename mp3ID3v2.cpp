@@ -4,7 +4,7 @@
 #include "mp3ID3v2.h"
 
 #define ID3V2_HEADER_IN_BYTES 10
-
+int errCode = 0;
 /****************
 
   4.2.1 TIT2 Title/songname/content description
@@ -120,10 +120,12 @@ int main(int argc,char* argv[])
 
    printf("\n");
    
-   if (status != ID3V2_STATUS_FILE_NOT_FOUND )
-	   fclose(fp);
+   if (status != ID3V2_STATUS_FILE_NOT_FOUND ) {
+	 fclose(fp);
+	 return(-1);
+   }	
    
-   return(0);
+   return(errCode);
 }
 
 /********************************	//skip 10 byte of mp3ID3v2 tag header
@@ -201,9 +203,11 @@ void printStatus(int status) {
 			printf("ID3V2 tag read success\n");
 			 	break;
 		case ID3V2_STATUS_FILE_NOT_FOUND:
+            errCode = -1;
 			printf("mp3 file not found\n");
 			 	break;
 		case ID3V2_STATUS_INVALID_TAG:
+            errCode = 2;
 			printf("Invalid tag\n");
 			 	break;
 		case ID3V2_STATUS_ID3_TAG_FOUND:
