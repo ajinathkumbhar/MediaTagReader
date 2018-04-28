@@ -37,7 +37,7 @@ enum id3v2_error_code {
 int isID3V2Tag(FILE *IDfp);
 int readID3V2TagHeader(FILE*, id3v2header*);
 void printStatus(int status);
-int readID3v2Frame(FILE *fp); 
+void readID3v2Frame(FILE *fp); 
 int readID3v2FrameHeader(FILE *fAdd,id3v2Frameheader * frameHead);
 char * readTag(FILE *fp);
 

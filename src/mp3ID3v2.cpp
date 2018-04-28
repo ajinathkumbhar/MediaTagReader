@@ -20,11 +20,11 @@ Flags          $xx xx
 endchar   null + size
 
 
-/************************
+
 * func : int readID3v2Frame(FILE *fp) 
 *
 *********************************/
-int readID3v2Frame(FILE *fp) {
+void readID3v2Frame(FILE *fp) {
     int count=0;
     char id[4];
     int readByte;
@@ -68,6 +68,7 @@ int readID3v2Frame(FILE *fp) {
             printf("%c",frame->data[count]);
         printf("\n");
         count1++;
+        // check every loop
     }
 
 
@@ -78,9 +79,9 @@ int readID3v2Frame(FILE *fp) {
 *
 *********************************/
 int readID3v2FrameHeader(FILE *fAdd,id3v2Frameheader * frameHead) {
-    int readByte;
-    readByte = fread(frameHead, sizeof(id3v2Frameheader), 1, fAdd);
-return 1;
+    int readBytes;
+    readBytes = fread(frameHead, sizeof(id3v2Frameheader), 1, fAdd);
+ 	return readBytes ? ID3V2_STATUS_SUCCESS : ID3V2_STATUS_READ_HEADER_FAILED; 
 }
 
 
@@ -113,8 +114,6 @@ int main(int argc,char* argv[])
 
 	if (status == ID3V2_STATUS_ID3_TAG_FOUND) {
 		readID3v2Frame(fp);
-	
-
 	}
 
 
