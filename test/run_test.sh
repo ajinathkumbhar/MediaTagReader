@@ -1,7 +1,6 @@
 #!/bin/bash
 
-PROG_NAME="getmp3info"
-DATA_DIR="/home/ajinath/work/00_Me/media/mp3/#Ne#w"
+PROG_NAME="getMp3Info"
 TEST_DATA_DIR="test_data"
 
 
@@ -40,15 +39,15 @@ function prepare_test_content() {
     mkdir ./tmp
     mkdir ./tmp/$TEST_DATA_DIR
 
-    cp -rf $DATA_DIR ./tmp/raw_content
+    cp -rf $DATA_DIR/* ./tmp/test_data/
 
     i=0;
     FILE_NAME_PATTERN="test_file_${i}.mp3"
 
-    for file in ./tmp/raw_content/* 
+    for file in ./tmp/test_data/* 
     do 
         FILE_NAME_PATTERN="test_file_${i}.mp3"
-        cp "$file" ./tmp/$TEST_DATA_DIR/${FILE_NAME_PATTERN}
+        cp -rf "$file" ./tmp/$TEST_DATA_DIR/${FILE_NAME_PATTERN}
         i=$(expr $i + 1 )
         echo " Prepare test content : $file >>>>> $FILE_NAME_PATTERN"
     done
@@ -56,8 +55,23 @@ function prepare_test_content() {
 } 
 
 
-if [ ! -f ./${PROG_NAME} ]; then
-    print_error_and_exit " The program might be incorrect or programe not found in cureent directory"
+function usage() {
+	echo " Usage:"
+	echo "      $1 <mp3_file_dir>"
+	exit -1	
+}
+
+if [ -z $1 ] ;  then 
+	usage $0
+fi
+
+DATA_DIR=$1
+
+command -v ${PROG_NAME} 2>&1 > /dev/null 
+
+if [ "$?" != "0" ] ; then
+	print_error_and_exit " The program might be incorrect or programe not found in cureent directory"
+
 fi
 
 if [ ! -d ${DATA_DIR} ]; then
@@ -71,7 +85,7 @@ ErrorCode=""
 ErrorCount=0;
 for file in ./tmp/$TEST_DATA_DIR/*; 
 do
-    ./${PROG_NAME} $file 
+    ${PROG_NAME} $file 
     ErrorCode=$?
 
     if [ "$ErrorCode" == "255" ]; then
