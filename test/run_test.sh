@@ -47,7 +47,7 @@ function prepare_test_content() {
     for file in ./tmp/test_data/* 
     do 
         FILE_NAME_PATTERN="test_file_${i}.mp3"
-        cp -rf "$file" ./tmp/$TEST_DATA_DIR/${FILE_NAME_PATTERN}
+        mv "$file" ./tmp/$TEST_DATA_DIR/${FILE_NAME_PATTERN}
         i=$(expr $i + 1 )
         echo " Prepare test content : $file >>>>> $FILE_NAME_PATTERN"
     done
@@ -85,7 +85,8 @@ ErrorCode=""
 ErrorCount=0;
 for file in ./tmp/$TEST_DATA_DIR/*; 
 do
-    ${PROG_NAME} $file 
+    print_info "Proccessing $file "
+    ${PROG_NAME} $file
     ErrorCode=$?
 
     if [ "$ErrorCode" == "255" ]; then
@@ -101,3 +102,5 @@ do
 
 done
         print_info "Error count : $ErrorCount"
+
+rm -rf ./tmp
